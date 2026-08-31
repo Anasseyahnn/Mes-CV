@@ -34,3 +34,17 @@ Chaque CV est rangé dans le dossier correspondant à la catégorie du poste vis
 | `Autre/` | Toute autre catégorie ne rentrant pas dans les précédentes |
 
 Chaque candidature envoyée doit être loggée dans [`CANDIDATURES.md`](./CANDIDATURES.md).
+
+## Script de génération (`_scripts/generate_cv.py`)
+
+Automatise la copie/renommage du CV de base et l'ajout de la ligne dans `CANDIDATURES.md`.
+
+1. Déposer le CV de base (`.docx`) dans `_base/`.
+2. Vérifier `_scripts/config.json` (prénom/nom).
+3. Lancer :
+
+```bash
+python _scripts/generate_cv.py --base _base/CV_base.docx --poste "AI Engineer" \
+  --entreprise UNICEF --categorie AI-ML-Engineering --annee 2026 \
+  --lien "https://..." --statut "Envoyée"
+```
