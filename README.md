@@ -35,16 +35,42 @@ Chaque CV est rangé dans le dossier correspondant à la catégorie du poste vis
 
 Chaque candidature envoyée doit être loggée dans [`CANDIDATURES.md`](./CANDIDATURES.md).
 
+## Objectif de campagne
+
+**4 entretiens minimum**, sur des postes à responsabilité (Lead / Head / Manager) en Data Science, IA ou Ingénierie LLM, cohérents avec le profil GitHub/portfolio.
+
 ## Script de génération (`_scripts/generate_cv.py`)
 
-Automatise la copie/renommage du CV de base et l'ajout de la ligne dans `CANDIDATURES.md`.
+Automatise la copie/renommage du CV de base, l'adaptation du titre à l'offre, et l'ajout de la ligne dans `CANDIDATURES.md`.
 
-1. Déposer le CV de base (`.docx`) dans `_base/`.
+1. Le CV de base (`.docx`) est dans `_base/CV_base.docx`, généré par `_scripts/build_master_cv.py` (source éditable — modifier ce script plutôt que le `.docx` directement, puis relancer `python _scripts/build_master_cv.py`).
 2. Vérifier `_scripts/config.json` (prénom/nom).
 3. Lancer :
 
 ```bash
-python _scripts/generate_cv.py --base _base/CV_base.docx --poste "AI Engineer" \
-  --entreprise UNICEF --categorie AI-ML-Engineering --annee 2026 \
-  --lien "https://..." --statut "Envoyée"
+python _scripts/generate_cv.py --poste "Lead Data Scientist" --entreprise UNICEF \
+  --categorie AI-ML-Engineering --annee 2026 --lien "https://..." \
+  --titre "Lead Data Scientist — UNICEF"
+```
+
+`--titre` adapte l'accroche du CV (2e ligne) à l'offre visée ; `--base` reste disponible pour utiliser un autre fichier de base.
+
+## Suivi des candidatures
+
+Statuts standardisés (colonne `Statut` de `CANDIDATURES.md`) :
+
+`Brouillon — en attente de validation` → `Envoyée` → `Entretien programmé` → `Entretien réalisé` → `Refusée` / `Offre reçue`
+
+Pour mettre à jour le statut d'une candidature déjà loggée :
+
+```bash
+python _scripts/mark_entretien.py --fichier "Data-Science/Anasse_Yahanan_....docx" --statut "Entretien programmé"
+```
+
+## Bilan hebdomadaire (`_scripts/bilan.py`)
+
+Calcule le ratio CV envoyés / entretiens obtenus (total + 7 derniers jours + par catégorie) et l'ajoute en tête de `BILAN.md`.
+
+```bash
+python _scripts/bilan.py
 ```

@@ -16,9 +16,12 @@ import unicodedata
 from datetime import date
 from pathlib import Path
 
+from docx import Document
+
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = Path(__file__).resolve().parent / "config.json"
 LOG_PATH = ROOT / "CANDIDATURES.md"
+DEFAULT_BASE = ROOT / "_base" / "CV_base.docx"
 
 CATEGORIES = [
     "AI-ML-Engineering",
@@ -59,7 +62,11 @@ def append_log(row: list[str]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--base", required=True, help="Chemin du CV de base (.docx)")
+    parser.add_argument(
+        "--base",
+        default=str(DEFAULT_BASE),
+        help="Chemin du CV de base (.docx). Par défaut: _base/CV_base.docx",
+    )
     parser.add_argument("--poste", required=True, help="Intitulé du poste visé")
     parser.add_argument("--entreprise", required=True, help="Nom de l'entreprise")
     parser.add_argument("--categorie", required=True, choices=CATEGORIES)
@@ -68,6 +75,11 @@ def main() -> None:
     )
     parser.add_argument("--lien", default="", help="Lien vers l'offre")
     parser.add_argument("--statut", default="Envoyée", help="Statut de la candidature")
+    parser.add_argument(
+        "--titre",
+        default="",
+        help="Remplace l'accroche du CV (2e ligne) par ce titre, adapté à l'offre",
+    )
     args = parser.parse_args()
 
     base_path = Path(args.base)
@@ -91,6 +103,17 @@ def main() -> None:
         sys.exit(f"Un CV existe déjà pour cette candidature: {dest_path}")
 
     shutil.copy2(base_path, dest_path)
+
+    if args.titre:
+        doc = Document(dest_path)
+        tagline_paragraph = doc.paragraphs[1]
+        for run in tagline_paragraph.runs:
+            run.text = ""
+        if tagline_paragraph.runs:
+            tagline_paragraph.runs[0].text = args.titre
+        else:
+            tagline_paragraph.add_run(args.titre)
+        doc.save(dest_path)
 
     rel_path = dest_path.relative_to(ROOT).as_posix()
     # Ordre des colonnes = celui déjà en place dans CANDIDATURES.md
